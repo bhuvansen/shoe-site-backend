@@ -25,6 +25,7 @@ exports.signup = (req, res) => {
         error: "Unable to create customer. Please try again later",
       })
     }
+    console.log("req", req.body)
     const user = new User(req.body)
     user.save((err, user) => {
       if (err) {

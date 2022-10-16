@@ -1,5 +1,6 @@
 const User = require("../models/user")
 const Order = require("../models/order")
+const bcrypt = require('bcrypt');
 
 
 exports.getUserById=(req, res, next, id)=>{
@@ -24,7 +25,48 @@ exports.getUser=(req, res)=>{
     return res.json(req.profile)
 } 
 
-exports.updateUser=(req, res)=>{    
+exports.checkPassword=async(req, res, next)=>{
+  if (req.body.password){
+    if(req.body.password.length<6){
+      return res.status(400).json({
+        error: `Password should be atleast 6 characters long`
+    })
+    }else{
+      let regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^\&*\)\(+=._-])[!-~]{6,}$/
+      if (!regex.test(req.body.password)){
+        return res.status(400).json({
+          error: `Password should be combination of Uppercase, lowercase, digits and special characters`
+        })
+      }else{
+        req.body.password = await bcrypt.hash(req.body.password, 12)
+      }
+    }
+  }
+  if(req.body.firstName){
+    if(req.body.firstName.length<6){
+      return res.status(400).json({
+        error: `First Name should be atleast 3 characters long`
+      })
+    }
+  }
+  if (req.body.email){
+    if(req.body.email.length===0){
+      return res.status(400).json({
+        error: `Email field cannot be empty`
+      })
+    }else{
+      let regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
+      if (!regex.test(req.body.email)){
+        return res.status(400).json({
+          error: `Please enter a valid email`
+        })
+      }
+    }
+  }
+  next()
+}
+
+exports.updateUser=(req, res)=>{ 
     User.findByIdAndUpdate(
         {_id : req.profile._id},
         {$set: req.body},
@@ -66,6 +108,7 @@ exports.pushOrderInPurchaseList = (req, res, next) => {
         quantity: product.quantity,
         amount: req.body.order.amount,
         transaction_id: req.body.order.transaction_id,
+        status: "Received"
       });
     });
       // Store this in DB
