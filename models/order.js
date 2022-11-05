@@ -27,6 +27,11 @@ const orderSchema = new Schema(
     transaction_id: {},
     amount: { type: Number },
     address: String,
+    payment: {
+      type: String,
+      default: "Paid",
+      enum: ["COD", "Paid"],
+    },
     status: {
       type: String,
       default: "Received",

@@ -22,13 +22,6 @@ const productSchema = new Schema({
   },
   quantity: {
       type:Schema.Types.Mixed
-    // default:
-
-      // required:true,
-      // default:[{
-      //   size: {type: Number, required:true},
-      //   quantity: {type: Number, required:true} 
-      // }]
   },
   stock: {
     type: Number,
